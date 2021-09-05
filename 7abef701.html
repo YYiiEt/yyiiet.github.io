@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yyiiet.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="根据官方文档，给出了四种安装途径，鉴于目前dns存在污染的情况使github访问不稳定，所以综合体验最佳Container方式。  确保设备上已安装Docker，以下是官方的直装脚本： 1 2   curl -fsSL https:&#x2F;&#x2F;get.docker.com -o get-docker.sh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Debian&#x2F;Armbian安装HomeAssistant流程记录">
+<meta property="og:url" content="https://yyiiet.github.io/7abef701.html">
+<meta property="og:site_name" content="YiiEt&#39;s Blog">
+<meta property="og:description" content="根据官方文档，给出了四种安装途径，鉴于目前dns存在污染的情况使github访问不稳定，所以综合体验最佳Container方式。  确保设备上已安装Docker，以下是官方的直装脚本： 1 2   curl -fsSL https:&#x2F;&#x2F;get.docker.com -o get-docker.sh">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yyiiet.github.io/7abef701/1.png">
+<meta property="og:image" content="https://yyiiet.github.io/7abef701/2.png">
+<meta property="og:image" content="https://yyiiet.github.io/7abef701/3.png">
+<meta property="og:image" content="https://yyiiet.github.io/7abef701/4.png">
+<meta property="article:published_time" content="2021-09-05T01:48:14.000Z">
+<meta property="article:modified_time" content="2021-09-05T02:00:58.453Z">
+<meta property="article:author" content="YiiEt">
+<meta property="article:tag" content="智能家居">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://yyiiet.github.io/7abef701/1.png">
+
+<link rel="canonical" href="https://yyiiet.github.io/7abef701.html">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Debian/Armbian安装HomeAssistant流程记录 | YiiEt's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">YiiEt's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://yyiiet.github.io/7abef701.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="YiiEt">
+      <meta itemprop="description" content="数码/公考/桌搭">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YiiEt's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Debian/Armbian安装HomeAssistant流程记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-09-05 09:48:14 / 修改时间：10:00:58" itemprop="dateCreated datePublished" datetime="2021-09-05T09:48:14+08:00">2021-09-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>根据官方文档，给出了四种安装途径，鉴于目前dns存在污染的情况使github访问不稳定，所以综合体验最佳Container方式。</p>
+<h6 id="确保设备上已安装Docker，以下是官方的直装脚本："><a href="#确保设备上已安装Docker，以下是官方的直装脚本：" class="headerlink" title="确保设备上已安装Docker，以下是官方的直装脚本："></a>确保设备上已安装Docker，以下是官方的直装脚本：</h6><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">sudo sh get-docker.sh</span><br></pre></td></tr></table></figure>
+
+<h6 id="安装完成后，优化Docker配置，换源及限制日志文件大小："><a href="#安装完成后，优化Docker配置，换源及限制日志文件大小：" class="headerlink" title="安装完成后，优化Docker配置，换源及限制日志文件大小："></a>安装完成后，优化Docker配置，换源及限制日志文件大小：</h6><ul>
+<li>首先创建文件 /etc/docker/daemon.json</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nano /etc/docker/daemon.json</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>然后修改文件内容并保存。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;log-driver&quot;:&quot;json-file&quot;,</span><br><span class="line">  &quot;log-opts&quot;: &#123;&quot;max-size&quot;:&quot;50m&quot;, &quot;max-file&quot;:&quot;3&quot;&#125;,</span><br><span class="line">  &quot;registry-mirrors&quot;: [&quot;https://docker.mirrors.ustc.edu.cn&quot;]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使配置文件生效。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl daemon-reload</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h6 id="运行Homeassistant主程序"><a href="#运行Homeassistant主程序" class="headerlink" title="运行Homeassistant主程序:"></a>运行Homeassistant主程序:</h6><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker run --init -d \</span><br><span class="line">  --name homeassistant \</span><br><span class="line">  --privileged \</span><br><span class="line">  --restart=unless-stopped \</span><br><span class="line">  -v /etc/localtime:/etc/localtime:ro \</span><br><span class="line">  -v /run/dbus:/run/dbus:ro \</span><br><span class="line">  -v /etc/home-assistant:/config \</span><br><span class="line">  --network=host \</span><br><span class="line">  home-assistant/home-assistant:stable</span><br></pre></td></tr></table></figure>
+
+<p>配置文件保存在/etc/home-assistant下，也可自行修改替换。安装完成后网页访问<u>设备ip:8123</u>即可进入Web管理页面。</p>
+<p>根据引导流程结束后，点击用户头像解锁高级模式。</p>
+<p><img src="/7abef701/1.png"></p>
+<hr>
+<h6 id="替换默认数据库："><a href="#替换默认数据库：" class="headerlink" title="替换默认数据库："></a>替换默认数据库：</h6><p>Homeassistant默认使用Sqlite数据库，在存储大量传感器的历史数据后访问性能较差，所以推荐使用Mariadb进行替换。</p>
+<ul>
+<li>Docker安装Mariadb，MYSQL_ROOT_PASSWORD=后可修改为自定义密码，进入容器并创建数据库。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root --name mariadb mariadb:latest</span><br><span class="line">docker exec -it mariadb bash</span><br><span class="line">mysql -u root -p</span><br><span class="line">Enter password: 设定的密码</span><br><span class="line">CREATE DATABASE homeassistant；</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改/etc/home-assistant目录下的configuration.yaml配置文件，添加如下内容并保存。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">recorder:</span><br><span class="line">  db_url: mysql://root:设定的密码@127.0.0.1/homeassistant?charset=utf8</span><br><span class="line">  purge_keep_days: 7</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>进入Web端配置页面，选择服务控制，检查配置文件是否规范并重启。</li>
+</ul>
+<p><img src="/7abef701/2.png" alt="2"></p>
+<hr>
+<h6 id="配置优化"><a href="#配置优化" class="headerlink" title="配置优化:"></a>配置优化:</h6><p>configuration.yaml添加auth_providers字段实现局域网免登录。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">homeassistant:</span><br><span class="line">  ...</span><br><span class="line">  auth_providers:</span><br><span class="line">    - type: trusted_networks</span><br><span class="line">      trusted_networks: 192.168.1.0/24</span><br><span class="line">      allow_bypass_login: true</span><br><span class="line">    - type: homeassistant</span><br></pre></td></tr></table></figure>
+
+<p>添加系统信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">sensor:</span><br><span class="line">  - platform: command_line</span><br><span class="line">    name: 核心温度</span><br><span class="line">    command: &quot;cat /sys/class/thermal/thermal_zone0/temp&quot;</span><br><span class="line">    unit_of_measurement: &quot;°C&quot;</span><br><span class="line">    value_template: &#x27;&#123;&#123; value | multiply(0.001) | round(1) &#125;&#125;&#x27;</span><br><span class="line">    scan_interval: 60</span><br><span class="line">    command_timeout: 15</span><br><span class="line">  - platform: systemmonitor</span><br><span class="line">    resources:</span><br><span class="line">      - type: memory_use_percent</span><br><span class="line">  - platform: cpuspeed</span><br><span class="line">    name: CPU</span><br><span class="line">  - platform: template</span><br><span class="line">    sensors:</span><br><span class="line">      cpu_arch:</span><br><span class="line">        icon_template: mdi:gradient</span><br><span class="line">        friendly_name: &quot;指令架构&quot;</span><br><span class="line">        value_template: &quot;&#123;% if states.sensor.cpu %&#125; &#123;&#123; states.sensor.cpu.attributes.arch &#125;&#125; &#123;% endif %&#125;&quot;</span><br><span class="line">      cpu_brand:</span><br><span class="line">        icon_template: mdi:copyright</span><br><span class="line">        friendly_name: &quot;品牌型号&quot;</span><br><span class="line">        value_template: &quot;&#123;% if states.sensor.cpu %&#125; &#123;&#123; states.sensor.cpu.attributes.brand &#125;&#125; &#123;% endif %&#125;&quot;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h6 id="安装HACS："><a href="#安装HACS：" class="headerlink" title="安装HACS："></a>安装HACS：</h6><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#进入homeassistant容器</span><br><span class="line">docker exec -it homeassistant bash</span><br><span class="line">#下载自定义组件HACS</span><br><span class="line">wget -q -O - https://hacs.xyz/install | bash -</span><br></pre></td></tr></table></figure>
+
+<p>设置-集成-添加HACS，根据引导给予github授权。</p>
+<hr>
+<h6 id="部分官方Supervisor插件替代："><a href="#部分官方Supervisor插件替代：" class="headerlink" title="部分官方Supervisor插件替代："></a>部分官方Supervisor插件替代：</h6><ul>
+<li>RPC Shutdown远程关机</li>
+</ul>
+<p>进入homeassistant容器，运行命令。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apk add --no-cache samba-common-tools samba-common</span><br></pre></td></tr></table></figure>
+
+<p>在configuration.yaml添加内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">shell_command:</span><br><span class="line">  shutdown_pc: net rpc shutdown -t 3 -I 电脑IP -U 用户名%用户密码</span><br><span class="line">switch:</span><br><span class="line">  - platform: wake_on_lan</span><br><span class="line">    name: &quot;电脑名称&quot;</span><br><span class="line">    mac: &quot;MAC地址&quot;</span><br><span class="line">    host: &quot;IP&quot;</span><br><span class="line">    turn_off:</span><br><span class="line">      service: shell_command.shutdown_pc</span><br></pre></td></tr></table></figure>
+
+<p>电脑下载导入<a target="_blank" rel="noopener" href="https://bbs.hassbian.com/thread-6996-1-1.html">瀚思彼岸这篇帖子的</a>注册表文件。bios中开启网络唤醒，具体方法搜索自己使用主板的品牌。</p>
+<p>在设备管理器-网络设备-对应网卡的高级选项中，将将魔术封包唤醒值设为Enable。再将电源管理选项中关闭设备以节约电源取消勾选。</p>
+<p><img src="/7abef701/3.png"></p>
+<p><img src="/7abef701/4.png"></p>
+<ul>
+<li>Configurator 在线配置编辑</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run --name configurator \</span><br><span class="line">  --restart=always \</span><br><span class="line">  -p 3218:3218/tcp \</span><br><span class="line">  -v /etc/configurator-config:/config \</span><br><span class="line">  -v /etc/homeassistant:/hass-config \</span><br><span class="line">  causticlab/hass-configurator-docker</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#配置文件中添加</span><br><span class="line">panel_iframe:</span><br><span class="line">  configurator:</span><br><span class="line">    title: &#x27;configurator&#x27;</span><br><span class="line">    icon: mdi:note-edit</span><br><span class="line">    url: &#x27;http://设备IP:3218&#x27;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%99%BA%E8%83%BD%E5%AE%B6%E5%B1%85/" rel="tag"># 智能家居</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/63ff5c4e.html" rel="prev" title="关于公考的一些心得">
+      <i class="fa fa-chevron-left"></i> 关于公考的一些心得
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E7%A1%AE%E4%BF%9D%E8%AE%BE%E5%A4%87%E4%B8%8A%E5%B7%B2%E5%AE%89%E8%A3%85Docker%EF%BC%8C%E4%BB%A5%E4%B8%8B%E6%98%AF%E5%AE%98%E6%96%B9%E7%9A%84%E7%9B%B4%E8%A3%85%E8%84%9A%E6%9C%AC%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">确保设备上已安装Docker，以下是官方的直装脚本：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E5%AE%8C%E6%88%90%E5%90%8E%EF%BC%8C%E4%BC%98%E5%8C%96Docker%E9%85%8D%E7%BD%AE%EF%BC%8C%E6%8D%A2%E6%BA%90%E5%8F%8A%E9%99%90%E5%88%B6%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">安装完成后，优化Docker配置，换源及限制日志文件大小：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%BF%90%E8%A1%8CHomeassistant%E4%B8%BB%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.</span> <span class="nav-text">运行Homeassistant主程序:</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%9B%BF%E6%8D%A2%E9%BB%98%E8%AE%A4%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">替换默认数据库：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%BC%98%E5%8C%96"><span class="nav-number">5.</span> <span class="nav-text">配置优化:</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%AE%89%E8%A3%85HACS%EF%BC%9A"><span class="nav-number">6.</span> <span class="nav-text">安装HACS：</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E9%83%A8%E5%88%86%E5%AE%98%E6%96%B9Supervisor%E6%8F%92%E4%BB%B6%E6%9B%BF%E4%BB%A3%EF%BC%9A"><span class="nav-number">7.</span> <span class="nav-text">部分官方Supervisor插件替代：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">YiiEt</p>
+  <div class="site-description" itemprop="description">数码/公考/桌搭</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YiiEt</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
